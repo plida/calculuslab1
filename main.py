@@ -20,12 +20,20 @@ def calculate_integral_sum(n, x, y, lab, fg, xi_type):
     summ = 0
     for i in range(n):
         colour = "red"
+        valuel = max(partitions_values[i])
+        valuer = min(partitions_values[i])
+        if i != 0:
+            valuel = partitions_values[i-1][-1]
+        if i != n-1:
+            valuer = partitions_values[i+1][0]
         match xi_type:
             case "max_darbu":
                 value = max(partitions_values[i])
+                value = max(valuel, value, valuer)
                 colour = "blue"
             case "min_darbu":
                 value = min(partitions_values[i])
+                value = min(valuel, value, valuer)
                 colour = "green"
             case "левое":
                 value = partitions_values[i][0]
@@ -40,14 +48,21 @@ def calculate_integral_sum(n, x, y, lab, fg, xi_type):
         plot_sums(partitions[i], darbu, colour, fg)
         summ += r * value
     plot_function(n, x, y, lab, fg)
-    return summ
+    return round(summ, 3)
 
 
 def main():
-    x = symbols('x')  # для integrate
     var = input("\nВведите свой вариант: ")
+    x = symbols('x')  # для integrate
     # выбираем вариант
     match var:
+        case "9":
+            lab = "f(x) = x^2"
+            r = [-3, 0]
+            x_range = np.arange(r[0], r[-1], 0.001)
+            f = [x ** 2 for x in x_range]
+            intg = integrate(x ** 2, x)
+            intg = lambdify(x, intg)  # первообразные
         case "17":
             lab = "f(x) = x^2"
             r = [-1, 1]
