@@ -1,4 +1,6 @@
 import math
+
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from sympy import *
@@ -14,6 +16,7 @@ def plot_function(n, x, y, lab, fg, title):
 
 
 def trap(n, x, y, func, lab, fg):
+    min_y = min(y)
     plot_function(n, x, y, lab, fg, 'Метод трапеций')  # рисуем саму функцию
     h = (max(x) - min(x)) / n  # смотрим длину шага (высота трапеции)
     x = np.linspace(min(x), max(x), n + 1)  # выбираем иксы из промежутка, чтобы их кол-во было равно n+1
@@ -22,9 +25,15 @@ def trap(n, x, y, func, lab, fg):
     for i in range(1, n + 1):
         integral += (y[i - 1] + y[i]) / 2 * h
     fg.plot(x, y, 'o-', color='brown', label=lab)  # сверху границы с точками
-    for i in range(n):  # соединяем основания
-        fg.plot([x[i], x[i]], [y[i], 0], color='brown')
-    fg.fill_between(x, y, color='brown', alpha=0.33)  # закрашиваем
+    for i in range(n + 1):
+        fg.plot([x[i], x[i]], [y[i], min_y], color='brown')  # соединяем основания
+        if i != 0:
+            polygon_1 = matplotlib.patches.Polygon([(x[i - 1], min_y),
+                                                    (x[i - 1], y[i - 1]),
+                                                    (x[i], y[i]),
+                                                    (x[i], min_y)])
+            fg.add_patch(polygon_1)  # создаем и добавляем трапецию
+            fg.plot([x[i - 1], x[i]], [min_y, min_y], color='brown')  # проводим высоту
     return integral
 
 
@@ -109,7 +118,7 @@ def main():
             f = [math.cos(2 * x) for x in x_range]
             intg = integrate(cos(2 * x), x)
             intg = lambdify(x, intg)
-            for_trap = lambdify(x, math.cos(2 * x))
+            for_trap = lambdify(x, cos(2 * x))
         case _:
             main()
             return
